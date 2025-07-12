@@ -1,5 +1,6 @@
 import winston from 'winston';
 import path from 'path';
+import {config} from "../config/config.js";
 
 // Define log levels
 const levels = {
@@ -24,7 +25,7 @@ winston.addColors(colors);
 
 // Define which logs to print
 const level = () => {
-  const env = process.env.NODE_ENV || 'development';
+  const env = config.NODE_ENV || 'development';
   const isDevelopment = env === 'development';
   return isDevelopment ? 'debug' : 'warn';
 };

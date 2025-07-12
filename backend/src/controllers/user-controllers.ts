@@ -4,6 +4,7 @@ import VerificationToken from "../models/VerificationToken.js";
 import Logger from "../utils/logger.js";
 import bcrypt from "bcrypt";
 import { generateVerificationToken, sendVerificationEmail } from "../utils/email.js";
+import {config} from "../config/config.js";
 
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {

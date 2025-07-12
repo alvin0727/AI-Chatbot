@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import {config} from "../config/config.js";
 
 export const generateVerificationToken = (): string => {
     return crypto.randomBytes(32).toString('hex');
@@ -9,15 +10,15 @@ export const sendVerificationEmail = async (email: string, token: string): Promi
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            user: config.EMAIL_USER,
+            pass: config.EMAIL_PASS,
         },
     });
 
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    const verificationLink = `${config.FRONTEND_URL}/verify-email?token=${token}`;
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: config.EMAIL_USER,
         to: email,
         subject: 'Verify Your Email Address',
         html: `

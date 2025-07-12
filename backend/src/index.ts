@@ -1,13 +1,16 @@
 import Logger from "./utils/logger.js";
 import app from "./app.js";
 import { connectToDatabase } from "./db/connection.js";
-
-// Connection and listening to the database
+import {config, validateConfig} from "./config/config.js";
 
 async function startServer() {
   try {
+    // Validate configuration
+    validateConfig();
+
+    // Connect to the database
     await connectToDatabase();
-    const PORT = process.env.PORT || 3000;
+    const PORT = config.PORT || 3000;
 
     app.listen(PORT, () => {
       Logger.info(`Server is running on port ${PORT}`);

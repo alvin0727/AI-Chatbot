@@ -7,4 +7,5 @@ userRoutes.get("/", getAllUsers);
 userRoutes.post("/signup", userSignup);
 userRoutes.get("/verify-email", verifyEmail);
 userRoutes.post("/resend-verification", resendVerification);
+
 export default userRoutes;

@@ -1,10 +1,11 @@
 import { connect, disconnect } from "mongoose";
 import Logger from "../utils/logger.js";
+import {config} from "../config/config.js";
 
 async function connectToDatabase() {
     try {
         Logger.info("Attempting to connect to MongoDB...");
-        await connect(process.env.MONGODB_URI);
+        await connect(config.MONGODB_URI);
         Logger.info("Successfully connected to MongoDB");
     } catch (error) {
         Logger.error(`Failed to connect to MongoDB: ${error.message}`);
