@@ -14,7 +14,7 @@ interface ChatbotConfig {
 
     // JWT
     JWT_SECRET: string;
-    JWT_EXPIRE: string;
+    JWT_REFRESH_SECRET: string;
 
     // OpenAI
     OPENAI_API_KEY: string;
@@ -66,7 +66,7 @@ export const config: ChatbotConfig = {
 
     // JWT
     JWT_SECRET: getEnvVar('JWT_SECRET'),
-    JWT_EXPIRE: getEnvVar('JWT_EXPIRE', '7d'),
+    JWT_REFRESH_SECRET: getEnvVar('JWT_REFRESH_SECRET'),
 
     // OpenAI
     OPENAI_API_KEY: getEnvVar('OPENAI_API_KEY'),
@@ -112,7 +112,6 @@ export const validateConfig = (): void => {
     Logger.info(`Port: ${config.PORT}`);
     Logger.info(`Frontend URL: ${config.FRONTEND_URL}`);
     Logger.info(`Log Level: ${config.LOG_LEVEL}`);
-    Logger.info(`JWT Expire: ${config.JWT_EXPIRE}`);
     Logger.info(`Email User: ${config.EMAIL_USER}`);
     Logger.info('All required environment variables are set\n');
 };

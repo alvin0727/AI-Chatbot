@@ -15,4 +15,9 @@ userRoutes.post("/resend-verification", validators.validate(validators.resendVer
 userRoutes.post("/login", validators.validate(validators.loginValidator), user.userLogin);
 userRoutes.post("/verify-login-otp", validators.validate(validators.verifyLoginOTPValidator), user.verifyLoginOTP);
 userRoutes.post("/resend-login-otp", validators.validate(validators.resendLoginOTPValidator), user.resendLoginOTP);
+
+// Cookies
+userRoutes.post("/refresh-token", user.refreshAccessToken);
+userRoutes.post("/logout", user.logout);
+
 export default userRoutes;

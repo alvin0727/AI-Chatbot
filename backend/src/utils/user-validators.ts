@@ -1,4 +1,3 @@
-import { log } from "console";
 import { Request, Response, NextFunction, } from "express";
 import { body, ValidationChain, validationResult, query } from "express-validator";
 

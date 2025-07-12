@@ -5,6 +5,8 @@ import Logger from "../utils/logger.js";
 import bcrypt from "bcrypt";
 import { generateVerificationToken, sendVerificationEmail } from "../utils/mail/email.js";
 import { generateOTP, sendOTPEmail } from "../utils/mail/otp.js";
+import { createToken, createRefreshToken, verifyRefreshToken } from "../utils/token-manager.js";
+import { config } from "../config/config.js"
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -172,13 +174,7 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
             Logger.warn(`User with email ${email} not found`);
             return res.status(404).json({ message: "User not found" });
         }
-
-        // Check if user is verified
-        if (!user.isVerified) {
-            Logger.warn("User is not verified");
-            return res.status(403).json({ message: "User is not verified. Please verify your email first." });
-        }
-
+        
         // Check password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
@@ -320,6 +316,43 @@ const verifyLoginOTP = async (req: Request, res: Response, next: NextFunction) =
         // OTP is valid - complete login
         await VerificationToken.findByIdAndDelete(otpToken._id); // Delete OTP token after successful verification
 
+        res.clearCookie('authToken', {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            signed: true,
+            sameSite: 'lax',
+            path: "/"
+        });
+
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            signed: true,
+            sameSite: 'lax',
+            path: "/"
+        });
+
+        const token = createToken(user._id.toString(), user.email, user.isVerified);
+        const refreshToken = createRefreshToken(user._id.toString(), user.email);
+
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            maxAge: 60 * 60 * 1000,
+            signed: true,
+            sameSite: 'lax',
+            path: "/"
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (match refresh token expiry)
+            signed: true,
+            sameSite: 'lax',
+            path: "/"
+        });
+
         Logger.info(`User ${email} signed in successfully with OTP`);
 
         return res.status(200).json({
@@ -346,11 +379,6 @@ const resendLoginOTP = async (req: Request, res: Response, next: NextFunction) =
         if (!user) {
             Logger.warn(`User with email ${email} not found`);
             return res.status(404).json({ message: "User not found" });
-        }
-
-        if (!user.isVerified) {
-            Logger.warn("User is not verified");
-            return res.status(403).json({ message: "User is not verified. Please verify your email first." });
         }
 
         // Check for active block
@@ -443,6 +471,94 @@ const resendLoginOTP = async (req: Request, res: Response, next: NextFunction) =
     }
 }
 
+const refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // Read refresh token from cookie
+        const refreshToken = req.signedCookies.refreshToken;
+
+        if (!refreshToken) {
+            return res.status(401).json({ message: "Refresh token not found" });
+        }
+
+        // Verify refresh token
+        const decoded = verifyRefreshToken(refreshToken);
+        if (!decoded) {
+            // Clear invalid refresh token cookie
+            res.clearCookie('refreshToken');
+            return res.status(403).json({ message: "Invalid refresh token" });
+        }
+
+        // Get user data
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            res.clearCookie('refreshToken');
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Generate new tokens
+        const newAccessToken = createToken(user._id.toString(), user.email, user.isVerified);
+        const newRefreshToken = createRefreshToken(user._id.toString(), user.email); // Token rotation
+
+        // Update both cookies
+        res.cookie('authToken', newAccessToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            maxAge: 60 * 60 * 1000, // 60 minutes
+            signed: true,
+            sameSite: 'lax',
+            path: "/"
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            signed: true,
+            sameSite: 'lax',
+            path: "/"
+        });
+
+        Logger.info(`Tokens refreshed for user ${user.email}`);
+
+        return res.status(200).json({
+            message: "Tokens refreshed successfully",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                isVerified: user.isVerified
+            }
+        });
+
+    } catch (error) {
+        Logger.error(`Error refreshing token: ${error.message}`);
+        return res.status(500).json({ message: "Error refreshing token" });
+    }
+};
+
+const logout = async (req: Request, res: Response) => {
+    res.clearCookie('authToken', {
+        httpOnly: true,
+        secure: config.NODE_ENV === 'production',
+        signed: true,
+        sameSite: 'lax',
+        path: "/"
+    });
+
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: config.NODE_ENV === 'production',
+        signed: true,
+        sameSite: 'lax',
+        path: "/"
+    });
+
+    Logger.info("User logged out successfully");
+
+    return res.status(200).json({ message: "Logged out successfully" });
+};
+
+
 export default {
     getAllUsers,
     userSignup,
@@ -450,5 +566,7 @@ export default {
     resendVerification,
     userLogin,
     verifyLoginOTP,
-    resendLoginOTP
+    resendLoginOTP,
+    refreshAccessToken,
+    logout
 };
