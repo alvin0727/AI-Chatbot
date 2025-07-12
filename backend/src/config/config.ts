@@ -29,6 +29,7 @@ interface ChatbotConfig {
     // Email
     EMAIL_USER: string;
     EMAIL_PASS: string;
+    NO_REPLY_EMAIL: string;
     FRONTEND_URL: string;
 }
 
@@ -80,6 +81,7 @@ export const config: ChatbotConfig = {
     // Email
     EMAIL_USER: getEnvVar('EMAIL_USER'),
     EMAIL_PASS: getEnvVar('EMAIL_PASS'),
+    NO_REPLY_EMAIL: getEnvVar('NO_REPLY_EMAIL'),
     FRONTEND_URL: getEnvVar('FRONTEND_URL', 'http://localhost:3000'),
 };
 
@@ -94,7 +96,8 @@ export const validateConfig = (): void => {
         'OPENAI_ORGANIZATION_ID',
         'COOKIE_SECRET',
         'EMAIL_USER',
-        'EMAIL_PASS'
+        'EMAIL_PASS',
+        'NO_REPLY_EMAIL',
     ];
 
     const missingVars = requiredVars.filter(varName => !process.env[varName]);

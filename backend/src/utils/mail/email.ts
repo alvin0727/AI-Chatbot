@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-import {config} from "../config/config.js";
+import { config } from "../../config/config.js";
 
 export const generateVerificationToken = (): string => {
     return crypto.randomBytes(32).toString('hex');
@@ -18,7 +18,10 @@ export const sendVerificationEmail = async (email: string, token: string): Promi
     const verificationLink = `${config.FRONTEND_URL}/verify-email?token=${token}`;
 
     const mailOptions = {
-        from: config.EMAIL_USER,
+        from: {
+            name: 'AI Chatbot - No Reply',
+            address: config.EMAIL_USER,
+        },
         to: email,
         subject: 'Verify Your Email Address',
         html: `
