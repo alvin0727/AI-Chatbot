@@ -17,7 +17,7 @@ const chatSchema = new mongoose.Schema({
     }
 });
 const userSchema = new mongoose.Schema({
-    Name: {
+    name: {
         type: String,
         required: true,
     },
@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     },
     createdAt: {
         type: Date,
