@@ -2,8 +2,31 @@ import React from "react";
 import { Box, Button } from "@mui/material";
 import { IoIosLogIn } from "react-icons/io"
 import CustomizedInput from "../components/shared/CustomizedInput";
+import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 const Login = () => {
+    const auth = useAuth();
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        // Handle login logic here
+        const formData = new FormData(event.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+        try {
+            toast.loading("Logging in...", { id: "login" });
+            if (!email || !password) {
+                toast.error("Please fill in all fields");
+                return;
+            }
+            await auth?.login(email, password);
+            toast.success("Login successful", { id: "login" });
+        } catch (error) {
+            toast.error("Login failed", { id: "login" });
+        }
+    };
     return (
         <Box width={"100%"} height={"100%"} display={"flex"} flex={1}>
             <Box padding={3} mt={8} display={{ md: "flex", xs: "none", sm: "none" }}>
@@ -18,7 +41,10 @@ const Login = () => {
                 ml={"auto"}
                 mt={16}
             >
-                <form className="m-auto p-7.5 shadow-lg rounded-lg border-none">
+                <form
+                    className="m-auto p-7.5 shadow-lg rounded-lg border-none"
+                    onSubmit={handleSubmit}
+                >
                     <Box sx={{
                         display: "flex",
                         flexDirection: "column",

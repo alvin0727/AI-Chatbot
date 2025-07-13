@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
+import * as AuthServices from "../services/auth-service";
 
 type User = {
     name: string;
@@ -15,7 +16,7 @@ type UserAuth = {
 }
 const AuthContext = createContext<UserAuth | null>(null);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => { 
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
@@ -26,7 +27,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (email: string, password: string) => {
-        //handle login logic
+        const data = await AuthServices.loginService(email, password);
+        if (data) {
+            setUser({ name: data.name, email: data.email });
+            setIsLoggedIn(true);
+        } else {
+            throw new Error("Login failed");
+        }
     };
     const signup = async (name: string, email: string, password: string) => {
         // handle signup logic
