@@ -174,7 +174,7 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
             Logger.warn(`User with email ${email} not found`);
             return res.status(404).json({ message: "User not found" });
         }
-        
+
         // Check password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
@@ -236,10 +236,13 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
 
         return res.status(200).json({
             message: "OTP sent to your email. Please verify to complete sign in.",
-            requiresOTP: true,
-            email: email,
-            expiresIn: 5, // minutes
-            maxAttempts: 3
+            data: {
+                name: user.name,
+                requiresOTP: true,
+                email: email,
+                expiresIn: 5, // minutes
+                maxAttempts: 3
+            }
         });
 
     } catch (error) {
