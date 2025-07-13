@@ -29,6 +29,7 @@ const loginValidator = [
         .isEmail()
         .withMessage("Invalid email format"),
     body("password")
+        .isLength({ min: 6 })
         .notEmpty()
         .withMessage("Password is required")
 ];

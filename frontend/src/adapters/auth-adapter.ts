@@ -1,9 +1,24 @@
 import api from "./api-communicator";
 
-export const loginAdapter = (email: string, password: string) => {
-    return api.post("/auth/login", { email, password });
+const loginAdapter = (email: string, password: string) => {
+    return api.post("/users/login", { email, password });
 };
 
-export const signupAdapter = (name: string, email: string, password: string) => {
-    return api.post("/auth/signup", { name, email, password });
+const verifyLoginOTPAdapter = (email: string, otp: string) => {
+    return api.post("/users/verify-login-otp", { email, otp });
+};
+
+const resendLoginOTPAdapter = (email: string) => {
+    return api.post("/users/resend-login-otp", { email });
+};
+
+const signupAdapter = (name: string, email: string, password: string) => {
+    return api.post("/users/signup", { name, email, password });
+};
+
+export default {
+    loginAdapter,
+    verifyLoginOTPAdapter,
+    resendLoginOTPAdapter,
+    signupAdapter
 };

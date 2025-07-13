@@ -18,13 +18,13 @@ const Login = () => {
         try {
             toast.loading("Logging in...", { id: "login" });
             if (!email || !password) {
-                toast.error("Please fill in all fields");
+                toast.error("Please fill in all fields", { id: "login" });
                 return;
             }
             await auth?.login(email, password);
             toast.success("Login successful", { id: "login" });
-        } catch (error) {
-            toast.error("Login failed", { id: "login" });
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Login failed", { id: "login" });
         }
     };
     return (

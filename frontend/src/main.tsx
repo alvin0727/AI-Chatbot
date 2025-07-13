@@ -16,13 +16,14 @@ const theme = createTheme({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <ThemeProvider theme={theme}>
           <Toaster position="top-right" />
           <App />
         </ThemeProvider>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>,
 )
+

@@ -1,16 +1,29 @@
-import { loginAdapter, signupAdapter } from "../adapters/auth-adapter";
+import AuthAdapter from "../adapters/auth-adapter";
 
 const loginService = async (email: string, password: string) => {
-    const response = await loginAdapter(email, password);
-    if (response.status !== 200) {
-        throw new Error("Login failed");
-    }
+    const response = await AuthAdapter.loginAdapter(email, password);
+    return response.data;
+
+};
+
+const verifyLoginOTPService = async (email: string, otp: string) => {
+    const response = await AuthAdapter.verifyLoginOTPAdapter(email, otp);
+    return response.data;
+};
+
+const resendLoginOTPService = async (email: string) => {
+    const response = await AuthAdapter.resendLoginOTPAdapter(email);
     return response.data;
 };
 
 const signupService = async (name: string, email: string, password: string) => {
-    const response = await signupAdapter(name, email, password);
+    const response = await AuthAdapter.signupAdapter(name, email, password);
     return response.data;
 };
 
-export { loginService, signupService };
+export {
+    loginService,
+    verifyLoginOTPService,
+    resendLoginOTPService,
+    signupService
+};

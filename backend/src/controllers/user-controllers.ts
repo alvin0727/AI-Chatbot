@@ -302,7 +302,8 @@ const verifyLoginOTP = async (req: Request, res: Response, next: NextFunction) =
 
                 return res.status(429).json({
                     message: `Too many failed attempts. Please try again in 15 minutes.`,
-                    blockTimeLeft: 15
+                    blockTimeLeft: 15,
+                    attemptsLeft: 0
                 });
             }
             await otpToken.save();

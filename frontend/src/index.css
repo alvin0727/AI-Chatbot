@@ -4,3 +4,15 @@
 body {
   @apply bg-gray-900 text-white;
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(0,0,0,0) inset !important;
+  box-shadow: 0 0 0 1000px rgba(0,0,0,0) inset !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff;
+  background-color: transparent !important;
+  transition: background-color 9999s ease-in-out 0s !important;
+}
