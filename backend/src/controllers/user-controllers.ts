@@ -557,6 +557,7 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
         authenticated: true,
         user: {
             id: user.id,
+            name: userDB.name,
             email: user.email,
             isVerified: user.isVerified
         }

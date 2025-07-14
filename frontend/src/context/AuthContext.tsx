@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 type User = {
     name: string;
     email: string;
+    isVerified?: boolean;
 };
 
 type UserAuth = {
@@ -22,16 +23,18 @@ const AuthContext = createContext<UserAuth | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
     const navigate = useNavigate();
     const location = useLocation();
 
     // Check auth status
     useEffect(() => {
         async function checkStatus() {
+            if (["/signup", "/otp"].includes(location.pathname)) return;
             try {
                 const data = await AuthServices.authStatusService();
                 if (data) {
-                    setUser({ name: data.name, email: data.email });
+                    setUser({ name: data.user.name, email: data.user.email, isVerified: data.user.isVerified });
                     setIsLoggedIn(true);
                 }
             } catch (error: any) {
@@ -39,9 +42,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setIsLoggedIn(false);
 
                 if (location.pathname !== "/login" && location.pathname !== "/signup") {
-                    toast.error((error.response?.data?.message + " - Please login again") || "Failed to fetch auth status - please login again");
-                    navigate("/login");
+                    if (isLoggingOut) {
+                        toast.success("Logout successful");
+                    } else {
+                        toast.error((error.response?.data?.message + " - Please login again") || "Failed to fetch auth status - please login again");
+                    }
                 }
+                navigate("/login");
             }
         }
         checkStatus();
@@ -72,8 +79,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             navigate("/");
         }
     };
-    const logout = () => {
-        // handle logout logic
+    const logout = async () => {
+        try {
+            setIsLoggingOut(true);
+            await AuthServices.logoutService();
+        } catch (error: any) {
+            setIsLoggingOut(false);
+            toast.error(error?.response?.data?.message || "Logout failed");
+        }
     };
 
     const value = {

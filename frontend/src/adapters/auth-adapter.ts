@@ -16,6 +16,10 @@ const signupAdapter = (name: string, email: string, password: string) => {
     return api.post("/users/signup", { name, email, password });
 };
 
+const logoutAdapter = () => {
+    return api.post("/users/logout");
+};
+
 const authStatus = () => {
     return api.get("/users/auth-status");
 };
@@ -25,5 +29,6 @@ export default {
     verifyLoginOTPAdapter,
     resendLoginOTPAdapter,
     signupAdapter,
+    logoutAdapter,
     authStatus
 };

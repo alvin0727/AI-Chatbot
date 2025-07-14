@@ -21,6 +21,11 @@ const signupService = async (name: string, email: string, password: string) => {
     return response.data;
 };
 
+const logoutService = async () => {
+    const response = await AuthAdapter.logoutAdapter();
+    return response.data;
+};
+
 const authStatusService = async () => {
     const response = await AuthAdapter.authStatus();
     return response.data;
@@ -31,5 +36,6 @@ export {
     verifyLoginOTPService,
     resendLoginOTPService,
     authStatusService,
-    signupService
+    signupService,
+    logoutService
 };

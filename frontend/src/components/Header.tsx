@@ -1,5 +1,4 @@
 import { AppBar, Toolbar } from "@mui/material";
-import React from "react";
 import Logo from "./shared/Logo";
 import { useAuth } from "../context/AuthContext";
 import NavigationLink from "./shared/NavigationLink";
@@ -13,8 +12,12 @@ const Header = () => {
                 <div>
                     {auth?.isLoggedIn ? (
                         <>
-                            <NavigationLink to="/chat" text="Go To Chat " className="bg-cyan-400 text-black" />
-                            <NavigationLink to="/logout" text="Logout" className="bg-[#51538f] text-white" />
+                            {
+                                auth?.user?.isVerified ? (
+                                    <NavigationLink to="/chat" text="Go To Chat " className="bg-cyan-400 text-black" />) :
+                                    <NavigationLink to="/verified" text="Email Verify " className="bg-cyan-400 text-black" />
+                            }
+                            <NavigationLink to="/logout" text="Logout" className="bg-[#51538f] text-white" onClick={async () => { auth?.logout(); }}/>
                         </>
                     ) : (
                         <>
