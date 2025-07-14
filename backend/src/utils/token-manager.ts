@@ -19,12 +19,13 @@ export const createToken = (id: string, email: string, isVerified: boolean): str
     });
 };
 
-export const verifyToken = (token: string): JWTPayload | null => {
-    try {
-        return jwt.verify(token, config.JWT_SECRET) as JWTPayload;
-    } catch (error) {
-        return null;
-    }
+export const verifyToken = async (token: string): Promise<JWTPayload | null> => {
+    return new Promise((resolve) => {
+        jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
+            if (err) return resolve(null);
+            resolve(decoded as JWTPayload);
+        });
+    });
 };
 
 export const createRefreshToken = (id: string, email: string): string => {
@@ -37,11 +38,11 @@ export const createRefreshToken = (id: string, email: string): string => {
         expiresIn: "7d" // Default to 7 days if not set
     });
 };
-
-export const verifyRefreshToken = (token: string): JWTPayload | null => {
-    try {
-        return jwt.verify(token, config.JWT_REFRESH_SECRET) as JWTPayload;
-    } catch (error) {
-        return null;
-    }
+export const verifyRefreshToken = async (token: string): Promise<JWTPayload | null> => {
+    return new Promise((resolve) => {
+        jwt.verify(token, config.JWT_REFRESH_SECRET, (err, decoded) => {
+            if (err) return resolve(null);
+            resolve(decoded as JWTPayload);
+        });
+    });
 };

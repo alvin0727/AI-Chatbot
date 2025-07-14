@@ -1,12 +1,21 @@
-import React from "react";
+import { useEffect } from "react";
 import { Box, Button } from "@mui/material";
 import { IoIosLogIn } from "react-icons/io"
 import CustomizedInput from "../components/shared/CustomizedInput";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const auth = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (auth?.isLoggedIn) {
+            navigate("/");
+        }
+    }, [auth?.isLoggedIn, navigate]);
+
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -79,3 +88,4 @@ const Login = () => {
 };
 
 export default Login;
+

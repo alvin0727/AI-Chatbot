@@ -1,6 +1,7 @@
 import { Router } from "express";
 import user from "../controllers/user-controllers.js";
 import validators from "../utils/user-validators.js";
+import { authenticate } from "../middleware/auth-middleware.js";
 
 const userRoutes = Router();
 
@@ -17,6 +18,7 @@ userRoutes.post("/verify-login-otp", validators.validate(validators.verifyLoginO
 userRoutes.post("/resend-login-otp", validators.validate(validators.resendLoginOTPValidator), user.resendLoginOTP);
 
 // Cookies
+userRoutes.get("/auth-status", authenticate, user.verifyUser);
 userRoutes.post("/refresh-token", user.refreshAccessToken);
 userRoutes.post("/logout", user.logout);
 

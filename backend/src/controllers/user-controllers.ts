@@ -465,8 +465,6 @@ const resendLoginOTP = async (req: Request, res: Response, next: NextFunction) =
 
         return res.status(200).json({
             message: "New OTP sent successfully",
-            expiresIn: 5,
-            maxAttempts: 3
         });
 
     } catch (error) {
@@ -485,7 +483,7 @@ const refreshAccessToken = async (req: Request, res: Response, next: NextFunctio
         }
 
         // Verify refresh token
-        const decoded = verifyRefreshToken(refreshToken);
+        const decoded = await verifyRefreshToken(refreshToken);
         if (!decoded) {
             // Clear invalid refresh token cookie
             res.clearCookie('refreshToken');
@@ -540,6 +538,32 @@ const refreshAccessToken = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
+const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+
+    const userDB = await User.findById(user.id);
+    if (!userDB) {
+        Logger.warn("User not found in database");
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    if (userDB._id.toString() !== user.id) {
+        Logger.warn("Permission mismatch");
+        return res.status(403).json({ message: "Permission mismatch" });
+
+    }
+
+    return res.status(200).json({
+        authenticated: true,
+        user: {
+            id: user.id,
+            email: user.email,
+            isVerified: user.isVerified
+        }
+    });
+
+};
+
 const logout = async (req: Request, res: Response) => {
     res.clearCookie('authToken', {
         httpOnly: true,
@@ -572,5 +596,6 @@ export default {
     verifyLoginOTP,
     resendLoginOTP,
     refreshAccessToken,
+    verifyUser,
     logout
 };
