@@ -1,9 +1,23 @@
-import React from "react";
-import { Box, Avatar, Button, Typography } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { Box, Avatar, Button, Typography, IconButton } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
+import ChatService from "../services/chat-service";
 import { red } from "@mui/material/colors";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { IoMdSend } from "react-icons/io";
+import ChatItem from "../components/chat/ChatItem";
 
+
+type ChatMessage = {
+    role: "user" | "assistant";
+    content: string;
+};
 const Chat = () => {
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const [messages, setChatMessages] = useState<ChatMessage[]>([]);
+
+    // --- Auth Context ---
     const auth = useAuth();
     const name = auth?.user?.name || "";
     const nameParts = name.split(" ");
@@ -11,6 +25,40 @@ const Chat = () => {
         nameParts.length === 1
             ? nameParts[0][0]
             : nameParts[0][0] + nameParts[1][0];
+    // --- End of Auth Context ---
+
+    // --- Navigation ---
+    const navigate = useNavigate();
+    // --- End of Navigation ---
+
+    // --- Handle Submit ---
+    const handleSubmit = async () => {
+        const content = inputRef.current?.value as string || ""
+        if (inputRef && inputRef.current) {
+            inputRef.current.value = "";
+        }
+        const newMessage: ChatMessage = {
+            role: "user",
+            content
+        };
+        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+
+        // Send API
+        const chatData = await ChatService.sendMessage(content);
+        setChatMessages([...chatData.chats])
+    };
+    // --- End of Handle Submit ---
+
+    // --- Check User Verification ---
+    useEffect(() => {
+        if (auth?.user && !auth.user.isVerified) {
+            toast.error("Please verify your email before accessing the chat.");
+            navigate("/");
+        }
+    }, [auth, navigate]);
+    // --- End of Check User Verification ---
+
+
     return (
         <Box
             sx={{
@@ -19,7 +67,7 @@ const Chat = () => {
                 width: '100%',
                 height: '100%',
                 mt: 3,
-                gap3: 3,
+                gap: 3,
             }}
         >
             <Box sx={{ display: { md: "flex", xs: "none", sm: "none" }, flex: 0.2, flexDirection: "column" }}>
@@ -78,16 +126,24 @@ const Chat = () => {
                         flexDirection: "column",
                         overflowX: "hidden",
                         overflowY: "auto",
-                        scrollBehavior: "smooth",
-                        bgcolor: "white",
-                        color: "black",
+                        scrollBehavior: "smooth"
                     }}
                 >
-                    {/* Example content to enable scrolling */}
-                    {[...Array(30)].map((_, i) => (
-                        <div key={i}>Line ke-{i + 1}</div>
-                    ))}
+                    {messages.map((chat, index) =>
+                        <ChatItem content={chat.content} role={chat.role} key={index} />
+                    )}
                 </Box>
+                <div className="w-full p-2.5 rounded-lg bg-[#111b27] flex mr-auto">
+                    {" "}
+                    <input ref={inputRef} type="text" className="w-full rounded-md bg-transparent p-2.5 border-none outline-none focus:ring-2 focus:ring-white text-white text-xl" onKeyDown={e => {
+                        if (e.key === "Enter") {
+                            handleSubmit();
+                        }
+                    }} />
+                    <IconButton onClick={handleSubmit} sx={{ ml: "auto", color: "white" }}>
+                        <IoMdSend />
+                    </IconButton>
+                </div>
             </Box>
         </Box>
     );

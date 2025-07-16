@@ -7,7 +7,7 @@ import Logger from "../utils/logger.js";
 
 const generateChatCompletion = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { messages } = req.body;
+        const { message } = req.body;
         const user = await User.findById((req as any).user.id);
 
         if (!user) {
@@ -23,8 +23,8 @@ const generateChatCompletion = async (req: Request, res: Response, next: NextFun
                 content
             }));
 
-        chats.push({ role: "user", content: messages });
-        user.chats.push({ role: "user", content: messages });
+        chats.push({ role: "user", content: message });
+        user.chats.push({ role: "user", content: message });
 
         // Send the chat messages to the AI service
         const openai = configAI.createOpenAI();
@@ -40,7 +40,7 @@ const generateChatCompletion = async (req: Request, res: Response, next: NextFun
             await user.save();
         }
 
-        res.status(200).json({ response: aiMessage });
+        res.status(200).json({ chats: user.chats });
     } catch (error) {
         Logger.error("Error generating chat completion:", error);
         res.status(500).json({ message: "Internal server error" });
