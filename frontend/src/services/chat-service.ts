@@ -10,6 +10,17 @@ const sendMessage = async (message: string) => {
     }
 }
 
+const getAllChats = async () => {
+    try {
+        const response = await ChatAdapter.getAllChatsAdapter();
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching all chats:", error);
+        throw error;
+    }
+}
+
 export default {
-    sendMessage
+    sendMessage,
+    getAllChats
 };

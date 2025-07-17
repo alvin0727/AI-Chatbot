@@ -47,12 +47,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     } else {
                         toast.error((error.response?.data?.message + " - Please login again") || "Failed to fetch auth status - please login again");
                     }
+                    navigate("/login");
                 }
-                navigate("/login");
             }
         }
         checkStatus();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname, navigate]);
 
     const login = async (email: string, password: string) => {

@@ -47,6 +47,23 @@ const generateChatCompletion = async (req: Request, res: Response, next: NextFun
     }
 }
 
+const getAllChats = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById((req as any).user.id);
+
+        if (!user) {
+            Logger.error("User not found or unauthorized access attempt");
+            return res.status(401).json({ message: "User not registered or unauthorized" });
+        }
+
+        res.status(200).json({ message: "OK", chats: user.chats });
+    } catch (error) {
+        Logger.error("Error fetching all chats:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export default {
-    generateChatCompletion
+    generateChatCompletion,
+    getAllChats
 };

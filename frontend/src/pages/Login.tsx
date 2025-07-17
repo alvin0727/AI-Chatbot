@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+
+    // --- User Auth ---
     const auth = useAuth();
     const navigate = useNavigate();
 
@@ -15,8 +17,10 @@ const Login = () => {
             navigate("/");
         }
     }, [auth?.isLoggedIn, navigate]);
+    
+    // --- End User Auth ---
 
-
+    // --- Submit ---
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
@@ -36,6 +40,8 @@ const Login = () => {
             toast.error(error?.response?.data?.message || "Login failed", { id: "login" });
         }
     };
+    // --- END Submit ---
+    
     return (
         <Box width={"100%"} height={"100%"} display={"flex"} flex={1}>
             <Box padding={3} mt={8} display={{ md: "flex", xs: "none", sm: "none" }}>

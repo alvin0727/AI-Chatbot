@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Box, Avatar, Button, Typography, IconButton } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import ChatService from "../services/chat-service";
@@ -58,6 +58,20 @@ const Chat = () => {
     }, [auth, navigate]);
     // --- End of Check User Verification ---
 
+
+    // --- Get Chat Messages ---
+    useLayoutEffect(() => {
+        if (auth?.isLoggedIn && auth?.user?.isVerified) {
+            toast.loading("Loading chat messages...", { id: "loading-chat" });
+            ChatService.getAllChats().then((data) => {
+                setChatMessages([...data.chats]);
+                toast.success("Chat messages loaded successfully.", { id: "loading-chat" });
+            }).catch((error) => {
+                toast.error(`Failed to load chat messages: ${error.message}`, { id: "loading-chat" });
+            });
+        }
+    }, [auth?.isLoggedIn, auth?.user?.isVerified]);
+    // --- End Get Chat Message
 
     return (
         <Box

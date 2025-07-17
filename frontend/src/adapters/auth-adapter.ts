@@ -24,11 +24,16 @@ const authStatus = () => {
     return api.get("/users/auth-status");
 };
 
+const refreshTokenAdapter = () => {
+    return api.post("/users/refresh-token");
+};
+
 export default {
     loginAdapter,
     verifyLoginOTPAdapter,
     resendLoginOTPAdapter,
     signupAdapter,
     logoutAdapter,
-    authStatus
+    authStatus,
+    refreshTokenAdapter
 };
