@@ -22,9 +22,16 @@ api.interceptors.response.use(
             try {
                 await AuthAdapter.refreshTokenAdapter();
                 return api(originalRequest);
-            } catch (refreshError) {
-                if (window.location.pathname !== "/login") {
-                    window.location.href = "/login";
+            } catch (refreshError: any) {
+                if (refreshError && typeof refreshError === "object") {
+                    refreshError.message = "Session expired. Please log in again.";
+                    if (
+                        refreshError.response &&
+                        refreshError.response.data &&
+                        typeof refreshError.response.data === "object"
+                    ) {
+                        refreshError.response.data.message = "Session expired. Please log in again.";
+                    }
                 }
                 return Promise.reject(refreshError);
             }

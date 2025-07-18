@@ -1,9 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Box, Avatar, Button, Typography, IconButton } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import ChatService from "../services/chat-service";
 import { red } from "@mui/material/colors";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { IoMdSend } from "react-icons/io";
 import ChatItem from "../components/chat/ChatItem";
@@ -27,10 +26,6 @@ const Chat = () => {
             : nameParts[0][0] + nameParts[1][0];
     // --- End of Auth Context ---
 
-    // --- Navigation ---
-    const navigate = useNavigate();
-    // --- End of Navigation ---
-
     // --- Handle Submit ---
     const handleSubmit = async () => {
         const content = inputRef.current?.value as string || ""
@@ -49,16 +44,6 @@ const Chat = () => {
     };
     // --- End of Handle Submit ---
 
-    // --- Check User Verification ---
-    useEffect(() => {
-        if (auth?.user && !auth.user.isVerified) {
-            toast.error("Please verify your email before accessing the chat.");
-            navigate("/");
-        }
-    }, [auth, navigate]);
-    // --- End of Check User Verification ---
-
-
     // --- Get Chat Messages ---
     useLayoutEffect(() => {
         if (auth?.isLoggedIn && auth?.user?.isVerified) {
@@ -72,6 +57,17 @@ const Chat = () => {
         }
     }, [auth?.isLoggedIn, auth?.user?.isVerified]);
     // --- End Get Chat Message
+
+    // --- Clear Chat Messages ---
+    const clearChatMessages = async () => {
+        try {
+            await ChatService.deleteAllChats();
+            setChatMessages([]);
+            toast.success("Chat messages cleared successfully.", { id: "clear-chat" });
+        } catch (error: any) {
+            toast.error(`Failed to clear chat messages: ${error.message}`, { id: "clear-chat" });
+        }
+    };
 
     return (
         <Box
@@ -120,7 +116,7 @@ const Chat = () => {
                                 bgcolor: red.A400,
                             },
                         }}
-                        onClick={() => alert("Button clicked!")}
+                        onClick={() => clearChatMessages()}
                     >
                         Clear Conversation
                     </Button>

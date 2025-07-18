@@ -20,7 +20,18 @@ const getAllChats = async () => {
     }
 }
 
+const deleteAllChats = async () => {
+    try {
+        const response = await ChatAdapter.deleteAllChatsAdapter();
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting all chats:", error);
+        throw error;
+    }
+}
+
 export default {
     sendMessage,
-    getAllChats
+    getAllChats,
+    deleteAllChats
 };
