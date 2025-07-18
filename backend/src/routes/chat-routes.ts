@@ -8,5 +8,6 @@ import chatControllers from "../controllers/chat-controllers.js";
 const chatRoutes = Router();
 chatRoutes.post('/new', validators.validate(validators.chatCompletionValidator), authenticate, requireVerified, chatControllers.generateChatCompletion);
 chatRoutes.get('/all-chats', authenticate, requireVerified, chatControllers.getAllChats);
+chatRoutes.delete('/delete-all-chats', authenticate, requireVerified, chatControllers.deleteChat);
 
 export default chatRoutes;

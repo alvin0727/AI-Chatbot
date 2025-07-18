@@ -63,7 +63,26 @@ const getAllChats = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const deleteChat = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById((req as any).user.id);
+
+        if (!user) {
+            Logger.error("User not found or unauthorized access attempt");
+            return res.status(401).json({ message: "User not registered or unauthorized" });
+        }
+
+        user.chats.splice(0, user.chats.length);
+        await user.save();
+        res.status(200).json({ message: "Success" });
+    } catch (error) {
+        Logger.error("Error deleting all chats:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export default {
     generateChatCompletion,
-    getAllChats
+    getAllChats,
+    deleteChat
 };
