@@ -6,7 +6,6 @@ import Login from "./pages/Login"
 import Chat from "./pages/Chat"
 import NotFound from "./pages/NotFound"
 import OTP from "./pages/OTP"
-import ProtectedRoute from "./components/ProtectedRoute"
 import { useLocation } from "react-router-dom";
 
 function App() {
@@ -19,14 +18,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/chat"
-          element={
-            <ProtectedRoute>
-              <Chat />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/chat" element={<Chat />} />
         <Route path="/otp" element={<OTP />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

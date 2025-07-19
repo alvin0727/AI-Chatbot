@@ -1,4 +1,4 @@
-import { TextField, IconButton, InputAdornment } from "@mui/material";
+import { TextField, IconButton, InputAdornment, useTheme, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
@@ -12,6 +12,9 @@ const CustomizedInput = (prop: Props) => {
     const [showPassword, setShowPassword] = useState(false);
 
     const isPassword = prop.type === "password";
+    const theme = useTheme();
+    const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+    const isSm = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
     return (
         <TextField
@@ -22,9 +25,9 @@ const CustomizedInput = (prop: Props) => {
             label={prop.label}
             InputProps={{
                 style: {
-                    width: "400px",
+                    width: isXs ? "100%" : isSm ? "300px" : "400px",
                     borderRadius: 10,
-                    fontSize: 20,
+                    fontSize: isXs ? 16 : isSm ? 18 : 20,
                     color: "white",
                     background: "transparent"
                 },
@@ -45,6 +48,7 @@ const CustomizedInput = (prop: Props) => {
                     background: "transparent",
                     "& input": {
                         background: "transparent",
+                        fontSize: isXs ? 16 : isSm ? 18 : 20,
                     },
                     "& fieldset": {
                         borderColor: "rgba(255,255,255,0.5)",
@@ -58,6 +62,7 @@ const CustomizedInput = (prop: Props) => {
                 },
                 "& .MuiInputLabel-root": {
                     color: "white",
+                    fontSize: isXs ? 16 : isSm ? 18 : 20,
                 },
             }}
         />

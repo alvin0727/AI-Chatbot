@@ -45,7 +45,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     if (isLoggingOut) {
                         toast.success("Logout successful");
                     } else {
-                        toast.error((error.response?.data?.message + " - Please login again") || "Failed to fetch auth status - please login again");
+                        if (error.response?.data?.message) {
+                            toast.error((error.response?.data?.message + " - Please login again") || "Failed to fetch auth status - please login again");
+                        } else {
+                            toast.error("Failed to fetch auth status - please login again");
+                        }
                     }
                     navigate("/login");
                 }

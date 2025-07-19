@@ -39,6 +39,10 @@ const OTP = () => {
         if (value && idx < 5) {
             inputs.current[idx + 1]?.focus();
         }
+        // Trigger submit automatically if all 6 digits are filled and all are numbers
+        if (newOtp.every(d => d.length === 1 && /^[0-9]$/.test(d))) {
+            setTimeout(() => handleSubmit(newOtp), 100); // pass newOtp to handleSubmit
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<Element>, idx: number) => {
@@ -60,18 +64,17 @@ const OTP = () => {
         }
     };
 
-    const handleSubmit = async () => {
-        const code = otp.join("");
-        // TODO: Submit OTP code
+    // Accept otpArr as optional parameter for correct value on auto-submit
+    const handleSubmit = async (otpArr?: string[]) => {
+        const code = (otpArr ?? otp).join("");
         try {
             toast.loading("Verifying OTP...", { id: "otp-verification" });
-            if (!code || code.length !== 6) {
+            if (code.length !== 6 || !/^\d{6}$/.test(code)) {
                 toast.error("Please enter a valid 6-digit OTP", { id: "otp-verification" });
                 return;
             }
             await auth?.verifyToken(email, code);
             toast.success("OTP verified successfully", { id: "otp-verification" });
-            // Redirect or perform next steps after successful verification
             navigate("/");
         } catch (error: any) {
             const msg = error?.response?.data?.message || "OTP verification failed";
@@ -79,7 +82,6 @@ const OTP = () => {
             setOtpError(msg);
             toast.error(msg, { id: "otp-verification" });
 
-            // Redirect if attempts are exceeded
             if (typeof left === "number" && left < 1) {
                 toast.error("Attempts exceeded. Please login again.", { id: "otp-verification" });
                 setTimeout(() => navigate("/login"), 1500);
@@ -150,7 +152,7 @@ const OTP = () => {
                             opacity: 0.6,
                         },
                     }}
-                    onClick={handleSubmit}
+                    onClick={() => handleSubmit()}
                     disabled={otp.some(d => d === "")}
                 >
                     Submit
