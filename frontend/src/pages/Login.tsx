@@ -17,7 +17,7 @@ const Login = () => {
             navigate("/");
         }
     }, [auth?.isLoggedIn, navigate]);
-    
+
     // --- End User Auth ---
 
     // --- Submit ---
@@ -41,23 +41,45 @@ const Login = () => {
         }
     };
     // --- END Submit ---
-    
+
     return (
-        <Box width={"100%"} height={"100%"} display={"flex"} flex={1}>
-            <Box padding={3} mt={8} display={{ md: "flex", xs: "none", sm: "none" }}>
-                <img src="login.png" alt="Robot" className="w-100" />
+        <Box
+            width="100%"
+            height="100%"
+            display="flex"
+            flex={1}
+            flexDirection={{ xs: "column", md: "row" }}
+            alignItems="center"
+            justifyContent="center"
+            gap={{ xs: 2, md: 4 }}
+        >
+            <Box
+                padding={{ xs: 2, md: 3 }}
+                mt={{ md: 8, xs: 2 }}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                flex={1}
+                width="100%"
+            >
+                <img
+                    src="login.png"
+                    alt="Robot"
+                    className="max-w-xs w-full h-auto mx-auto"
+                />
             </Box>
             <Box
-                display={"flex"}
-                flex={{ xs: 1, md: 0.5 }}
-                justifyContent={"center"}
-                alignItems={"center"}
-                padding={2}
-                ml={"auto"}
-                mt={16}
+                display="flex"
+                flex={1}
+                justifyContent="center"
+                alignItems="center"
+                padding={{ xs: 2, md: 4 }}
+                ml={{ md: "auto", xs: 0 }}
+                mt={{ md: 16, xs: 2 }}
+                width="100%"
             >
                 <form
-                    className="m-auto p-7.5 shadow-lg rounded-lg border-none"
+                    className="m-auto shadow-lg rounded-lg border-none bg-[#18202b] w-full max-w-md px-6 py-8"
                     onSubmit={handleSubmit}
                 >
                     <Box sx={{
@@ -65,22 +87,26 @@ const Login = () => {
                         flexDirection: "column",
                         justifyContent: "center",
                     }}>
-                        <h2 className="text-center p-2 font-bold text-4xl">Login</h2>
+                        <h2 className="text-center p-2 font-bold text-3xl md:text-4xl">Login</h2>
                         <CustomizedInput name="email" type="email" label="Email" />
                         <CustomizedInput name="password" type="password" label="Password" />
-                        <Button type="submit"
+                        <Button
+                            type="submit"
                             sx={{
                                 px: 2,
-                                py: 1,
+                                py: 1.5,
                                 mt: 2,
-                                width: "400px",
+                                width: { xs: "100%", md: "400px" },
                                 borderRadius: 2,
                                 bgcolor: "#00fffc",
                                 color: "black",
+                                fontWeight: 600,
+                                fontSize: { xs: "1rem", md: "1.1rem" },
                                 ":hover": {
                                     bgcolor: "#00b3b3",
                                     color: "white",
                                 },
+                                transition: "all 0.2s",
                             }}
                             endIcon={<IoIosLogIn />}
                         >

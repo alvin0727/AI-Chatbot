@@ -71,7 +71,7 @@ const userSignup = async (req: Request, res: Response, next: NextFunction) => {
 
 const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { token } = req.query;
+        const { token } = req.body;
 
         if (!token) {
             Logger.warn("Verification token is required");
@@ -558,8 +558,8 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
         user: {
             id: user.id,
             name: userDB.name,
-            email: user.email,
-            isVerified: user.isVerified
+            email: userDB.email,
+            isVerified: userDB.isVerified
         }
     });
 

@@ -25,7 +25,7 @@ const CustomizedInput = (prop: Props) => {
             label={prop.label}
             InputProps={{
                 style: {
-                    width: isXs ? "100%" : isSm ? "300px" : "400px",
+                    width: "100%",
                     borderRadius: 10,
                     fontSize: isXs ? 16 : isSm ? 18 : 20,
                     color: "white",

@@ -9,7 +9,7 @@ userRoutes.get("/", user.getAllUsers);
 
 // User Signup Route
 userRoutes.post("/signup", validators.validate(validators.signupValidator), user.userSignup);
-userRoutes.get("/verify-email", validators.validate(validators.verifyEmailValidator), user.verifyEmail);
+userRoutes.post("/verify-email", validators.validate(validators.verifyEmailValidator), user.verifyEmail);
 userRoutes.post("/resend-verification", validators.validate(validators.resendVerificationValidator), user.resendVerification);
 
 // User Login Route

@@ -21,6 +21,16 @@ const signupService = async (name: string, email: string, password: string) => {
     return response.data;
 };
 
+const resendVerificationEmailService = async (email: string) => {
+    const response = await AuthAdapter.resendVerificationEmailAdapter(email);
+    return response.data;
+};
+
+const verifyEmailService = async (token: string) => {
+    const response = await AuthAdapter.verifyEmailAdapter(token);
+    return response.data;
+};
+
 const logoutService = async () => {
     const response = await AuthAdapter.logoutAdapter();
     return response.data;
@@ -37,5 +47,7 @@ export {
     resendLoginOTPService,
     authStatusService,
     signupService,
+    resendVerificationEmailService,
+    verifyEmailService,
     logoutService
 };

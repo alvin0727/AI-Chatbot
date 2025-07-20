@@ -16,7 +16,8 @@ api.interceptors.response.use(
         if (
             error.response?.status === 401 &&
             !originalRequest._retry &&
-            !originalRequest.url.includes("/users/refresh-token")
+            !originalRequest.url.includes("/users/refresh-token") &&
+            error.response?.data?.message === "Unauthorized"
         ) {
             originalRequest._retry = true;
             try {

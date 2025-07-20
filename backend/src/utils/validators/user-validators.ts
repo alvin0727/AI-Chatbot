@@ -42,7 +42,7 @@ const signupValidator = [
 ];
 
 const verifyEmailValidator = [
-    query("token")
+    body("token")
         .notEmpty()
         .withMessage("Token is required")
 ];

@@ -16,6 +16,14 @@ const signupAdapter = (name: string, email: string, password: string) => {
     return api.post("/users/signup", { name, email, password });
 };
 
+const resendVerificationEmailAdapter = (email: string) => {
+    return api.post("/users/resend-verification", { email });
+};
+
+const verifyEmailAdapter = (token: string) => {
+    return api.post("/users/verify-email", { token });
+};
+
 const logoutAdapter = () => {
     return api.post("/users/logout");
 };
@@ -33,6 +41,8 @@ export default {
     verifyLoginOTPAdapter,
     resendLoginOTPAdapter,
     signupAdapter,
+    resendVerificationEmailAdapter,
+    verifyEmailAdapter,
     logoutAdapter,
     authStatus,
     refreshTokenAdapter

@@ -5,7 +5,6 @@ const sendMessage = async (message: string) => {
         const response = await ChatAdapter.sendMessageAdapter(message);
         return response.data;
     } catch (error) {
-        console.error("Error sending message:", error);
         throw error;
     }
 }
@@ -15,7 +14,6 @@ const getAllChats = async () => {
         const response = await ChatAdapter.getAllChatsAdapter();
         return response.data;
     } catch (error) {
-        console.error("Error fetching all chats:", error);
         throw error;
     }
 }
@@ -25,7 +23,6 @@ const deleteAllChats = async () => {
         const response = await ChatAdapter.deleteAllChatsAdapter();
         return response.data;
     } catch (error) {
-        console.error("Error deleting all chats:", error);
         throw error;
     }
 }
