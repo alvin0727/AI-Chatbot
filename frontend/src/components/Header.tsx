@@ -17,7 +17,16 @@ const Header = () => {
                                     <NavigationLink to="/chat" text="Go To Chat " className="bg-cyan-400 text-black" />) :
                                     <NavigationLink to="/verified" text="Email Verify " className="bg-cyan-400 text-black" />
                             }
-                            <NavigationLink to="/logout" text="Logout" className="bg-[#51538f] text-white" onClick={async () => { auth?.logout(); }}/>
+                            <NavigationLink
+                                to="/login"
+                                text="Logout"
+                                className="bg-[#51538f] text-white"
+                                onClick={async (e) => {
+                                    e.preventDefault();
+                                    auth?.logout();
+                                    window.location.href = "/login";
+                                }}
+                            />
                         </>
                     ) : (
                         <>

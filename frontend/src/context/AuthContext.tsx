@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Check auth status
     useEffect(() => {
         async function checkStatus() {
-            if (["/signup", "/otp"].includes(location.pathname)) return;
+            if (["/otp"].includes(location.pathname)) return;
             try {
                 const data = await AuthServices.authStatusService();
                 if (data) {
@@ -72,7 +72,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
     const signup = async (name: string, email: string, password: string) => {
-        // handle signup logic
+        try {
+            const res = await AuthServices.signupService(name, email, password);
+            if (res) {
+                navigate("/login");
+            } else {
+                throw new Error("Signup failed");
+            }
+        } catch (error: any) {
+            throw error;
+        }
     };
     const verifyToken = async (email: string, otp: string) => {
         const res = await AuthServices.verifyLoginOTPService(email, otp);

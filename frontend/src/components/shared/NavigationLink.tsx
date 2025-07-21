@@ -4,7 +4,7 @@ type Props = {
     to: string;
     className?: string;
     text: string;
-    onClick?: () => Promise<void>;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 };
 
 const NavigationLink = (props: Props) => {
@@ -15,7 +15,8 @@ const NavigationLink = (props: Props) => {
         <Link
             to={props.to}
             className={`${defaultStyle} ${props.className ?? ""}`}
-            onClick={props.onClick}>
+            onClick={props.onClick}
+        >
             {props.text}
         </Link>
     );
