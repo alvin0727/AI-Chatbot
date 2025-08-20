@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import User, { ChatLimit } from "../models/user.js";
+import User, { ChatLimit } from "../models/user";
 import configAI from "../config/openai-config.js";
 import { ChatCompletionUserMessageParam } from "openai/resources/chat/completions";
 import Logger from "../utils/logger.js";

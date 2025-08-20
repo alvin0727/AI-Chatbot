@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../models/user.js"
-import VerificationToken from "../models/verificationToken.js";
+import User from "../models/user"
+import VerificationToken from "../models/verificationToken";
 import Logger from "../utils/logger.js";
 import bcrypt from "bcrypt";
 import { generateVerificationToken, sendVerificationEmail } from "../utils/mail/email.js";
