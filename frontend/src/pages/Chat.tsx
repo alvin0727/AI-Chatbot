@@ -126,7 +126,6 @@ const Chat = () => {
                 loadChatLimitInfo()
             ]).then(([chatData, limitData]) => {
                 setChatMessages([...chatData.chats]);
-                // Ambil limit hanya dari limitData
                 setChatLimit({
                     remainingChats: limitData.remainingChats ?? 4,
                     dailyLimit: limitData.dailyLimit ?? 4,
