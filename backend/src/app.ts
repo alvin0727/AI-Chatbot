@@ -26,9 +26,9 @@ app.use(cookieParser(appConfig.COOKIE_SECRET)); // Optional secret for signed co
 // Middleware to log HTTP requests
 app.use(httpLogger);
 
+app.use("/api/v1", appRouter);
+
 // Middleware to handle errors
 app.use(errorLogger);
-
-app.use("/api/v1", appRouter);
 
 export default app;
