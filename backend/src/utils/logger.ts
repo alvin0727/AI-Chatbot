@@ -1,6 +1,17 @@
 import winston from 'winston';
 import path from 'path';
+import fs from 'fs';
 import { config } from "../config/config";
+
+// Ensure logs directory exists
+const logsDir = path.join(process.cwd(), 'logs');
+if (!fs.existsSync(logsDir)) {
+  try {
+    fs.mkdirSync(logsDir, { recursive: true });
+  } catch (error) {
+    console.warn('Could not create logs directory:', error.message);
+  }
+}
 
 // Define log levels
 const levels = {
@@ -20,17 +31,14 @@ const colors = {
   debug: 'white',
 };
 
-// Tell winston that you want to link the colors
 winston.addColors(colors);
 
-// Define which logs to print
 const level = () => {
   const env = config.NODE_ENV || 'development';
   const isDevelopment = env === 'development';
   return isDevelopment ? 'debug' : 'warn';
 };
 
-// Define format for logs
 const format = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
@@ -39,37 +47,40 @@ const format = winston.format.combine(
   ),
 );
 
-// Define which transports to use
-const transports = [
-  // Console transport
+// Create transports with error handling
+const createFileTransport = (filename: string, level?: string) => {
+  try {
+    return new winston.transports.File({
+      filename: path.join(logsDir, filename),
+      level: level || 'info',
+      maxsize: 5 * 1024 * 1024,
+      maxFiles: 3,
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.uncolorize(),
+        winston.format.json()
+      ),
+    });
+  } catch (error) {
+    console.warn(`Could not create file transport for ${filename}:`, error.message);
+    return null;
+  }
+};
+
+const transports: winston.transport[] = [
+  // Console transport (always available)
   new winston.transports.Console({
     level: level(),
     format: format,
   }),
-  // File transport for errors (without colors)
-  new winston.transports.File({
-    filename: path.join('logs', 'error.log'),
-    level: 'error',
-    maxsize: 5 * 1024 * 1024, // 5 MB
-    maxFiles: 3,              // Keep 3 backup files
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.uncolorize(),
-      winston.format.json()
-    ),
-  }),
-  // File transport for all logs (without colors)
-  new winston.transports.File({
-    filename: path.join('logs', 'combined.log'),
-    maxsize: 10 * 1024 * 1024, // 10 MB
-    maxFiles: 5,               // Keep 5 backup files
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.uncolorize(),
-      winston.format.json()
-    ),
-  }),
 ];
+
+// Add file transports if possible
+const errorFileTransport = createFileTransport('error.log', 'error');
+const combinedFileTransport = createFileTransport('combined.log');
+
+if (errorFileTransport) transports.push(errorFileTransport);
+if (combinedFileTransport) transports.push(combinedFileTransport);
 
 // Create the logger
 const Logger = winston.createLogger({
