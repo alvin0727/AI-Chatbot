@@ -149,12 +149,12 @@ jobs:
           cd /home/ubuntu/ai-chatbot
           docker compose ps
           
-          # Check container logs
+          # Check container logs - FIXED SERVICE NAMES
           echo "=== Chatbot Backend Logs (last 20 lines) ==="
-          docker compose logs --tail=20 chatbot-backend
+          docker compose logs --tail=20 backend
           
           echo "=== Chatbot Frontend Logs (last 20 lines) ==="
-          docker compose logs --tail=20 chatbot-frontend
+          docker compose logs --tail=20 frontend
           
           # Test backend health
           echo "=== Testing Chatbot Backend Health ==="
@@ -164,9 +164,9 @@ jobs:
           echo "=== Testing Chatbot Frontend Health ==="
           curl -f http://localhost:3001/ || echo "Chatbot frontend health check failed"
           
-          # Show final status
+          # Show final status - FIXED FILTER
           echo "=== Final Chatbot Deployment Status ==="
-          docker ps --filter "label=com.docker.compose.service=chatbot-backend" --filter "label=com.docker.compose.service=chatbot-frontend"
+          docker ps --filter "label=com.docker.compose.service=backend" --filter "label=com.docker.compose.service=frontend"
 
       - name: Cleanup old images
         run: |
