@@ -30,24 +30,21 @@ ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
 
 RUN npm run build
 
-# Production stage - Fixed
+# Production stage - Static Server
 FROM base AS production
 WORKDIR /app
+
+# Install static server
+RUN npm install -g serve
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 viteuser
 
-# Copy package.json
-COPY package*.json ./
-
-# Install ALL dependencies (including vite for preview command)
-RUN npm ci
-
-# Copy built application from builder stage
+# Copy built application
 COPY --from=builder /app/dist ./dist
 
-# Change ownership to non-root user
+# Change ownership
 RUN chown -R viteuser:nodejs /app
 USER viteuser
 
@@ -57,5 +54,5 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3001/ || exit 1
 
-# Start with vite preview
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "3001"]
+# Use static server (no vite.config.js needed)
+CMD ["serve", "-s", "dist", "-l", "3001", "-H", "0.0.0.0"]
