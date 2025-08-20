@@ -1,6 +1,6 @@
 import { connect, disconnect } from "mongoose";
-import Logger from "../utils/logger.js";
-import {config} from "../config/config.js";
+import Logger from "../utils/logger";
+import {config} from "../config/config";
 
 async function connectToDatabase() {
     try {

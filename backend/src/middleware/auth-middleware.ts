@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../utils/token-manager.js";
+import { verifyToken } from "../utils/token-manager";
 
 export async function authenticate(req: Request, res: Response, next: NextFunction) {
     const token = req.signedCookies?.authToken;

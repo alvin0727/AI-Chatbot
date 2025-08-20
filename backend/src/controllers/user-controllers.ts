@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/user"
 import VerificationToken from "../models/verificationToken";
-import Logger from "../utils/logger.js";
+import Logger from "../utils/logger";
 import bcrypt from "bcrypt";
-import { generateVerificationToken, sendVerificationEmail } from "../utils/mail/email.js";
-import { generateOTP, sendOTPEmail } from "../utils/mail/otp.js";
-import { createToken, createRefreshToken, verifyRefreshToken } from "../utils/token-manager.js";
-import { config } from "../config/config.js"
+import { generateVerificationToken, sendVerificationEmail } from "../utils/mail/email";
+import { generateOTP, sendOTPEmail } from "../utils/mail/otp";
+import { createToken, createRefreshToken, verifyRefreshToken } from "../utils/token-manager";
+import { config } from "../config/config"
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {

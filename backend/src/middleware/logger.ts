@@ -1,5 +1,5 @@
 import morgan from 'morgan';
-import Logger from '../utils/logger.js';
+import Logger from '../utils/logger';
 
 // Custom stream for Winston
 const stream = {

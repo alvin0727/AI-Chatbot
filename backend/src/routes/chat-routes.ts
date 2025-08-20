@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { authenticate, requireVerified } from "../middleware/auth-middleware.js";
-import validators from "../utils/validators/chat-validators.js";
-import chatControllers from "../controllers/chat-controllers.js";
+import { authenticate, requireVerified } from "../middleware/auth-middleware";
+import validators from "../utils/validators/chat-validators";
+import chatControllers from "../controllers/chat-controllers";
 
 
 // Protected API routes for chat functionality

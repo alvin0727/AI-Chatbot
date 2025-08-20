@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-import { config } from "../../config/config.js";
+import { config } from "../../config/config";
 
 export const generateVerificationToken = (): string => {
     return crypto.randomBytes(32).toString('hex');

@@ -1,7 +1,7 @@
-import Logger from "./utils/logger.js";
-import app from "./app.js";
-import { connectToDatabase } from "./db/connection.js";
-import {config, validateConfig} from "./config/config.js";
+import Logger from "./utils/logger";
+import app from "./app";
+import { connectToDatabase } from "./db/connection";
+import {config, validateConfig} from "./config/config";
 
 async function startServer() {
   try {

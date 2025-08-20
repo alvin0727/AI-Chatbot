@@ -1,10 +1,10 @@
 import express from 'express';
 import { config } from 'dotenv';
-import { httpLogger, errorLogger } from './middleware/logger.js';
+import { httpLogger, errorLogger } from './middleware/logger';
 import cors from 'cors';
-import appRouter from './routes/index.js';
+import appRouter from './routes/index';
 import cookieParser from 'cookie-parser';
-import { config as appConfig } from './config/config.js';
+import { config as appConfig } from './config/config';
 
 config();
 const app = express();

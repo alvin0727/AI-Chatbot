@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import User, { ChatLimit } from "../models/user";
-import configAI from "../config/openai-config.js";
+import configAI from "../config/openai-config";
 import { ChatCompletionUserMessageParam } from "openai/resources/chat/completions";
-import Logger from "../utils/logger.js";
+import Logger from "../utils/logger";
 
 // Helper function to check if date is today
 const isToday = (date: Date): boolean => {
