@@ -8,4 +8,18 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  server: {
+    host: '0.0.0.0',
+    port: 3001,
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 3001,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      'fechatbot.alvinboys.id',  // ← ADD YOUR DOMAIN
+      // Add other domains if needed
+    ]
+  }
 })
