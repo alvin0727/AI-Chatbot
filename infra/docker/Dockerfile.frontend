@@ -54,5 +54,5 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3001/ || exit 1
 
-# Use static server (no vite.config.js needed)
-CMD ["serve", "-s", "dist", "-l", "3001", "-H", "0.0.0.0"]
+# ✅ Fix: Gunakan flag yang benar untuk serve
+CMD ["serve", "-s", "dist", "-p", "3001"]
