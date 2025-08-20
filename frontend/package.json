@@ -15,6 +15,7 @@
     "@mui/material": "^7.2.0",
     "axios": "^1.10.0",
     "core-js": "^3.44.0",
+    "lucide-react": "^0.540.0",
     "prism-react-renderer": "^2.4.1",
     "prismjs": "^1.30.0",
     "react": "^19.1.0",

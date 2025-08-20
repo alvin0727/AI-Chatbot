@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Check auth status
     useEffect(() => {
         async function checkStatus() {
-            if (["/otp"].includes(location.pathname)) return;
+            if (["/otp", "/"].includes(location.pathname)) return;
             try {
                 const data = await AuthServices.authStatusService();
                 if (data) {

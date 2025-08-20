@@ -189,6 +189,7 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
             'otpMetadata.isBlocked': true,
             'otpMetadata.blockUntil': { $gt: new Date() }
         });
+        
 
         if (existingOTPToken) {
             const blockTimeLeft = Math.ceil((existingOTPToken.otpMetadata.blockUntil.getTime() - Date.now()) / (1000 * 60));
@@ -254,6 +255,65 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
 const verifyLoginOTP = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, otp } = req.body;
+
+        // --- WHITELIST: testone@yopmail.com + 999999 ---
+        if (email === "test@yopmail.com" && otp === "999999") {
+            const user = await User.findOne({ email });
+            if (!user) {
+                Logger.warn(`User with email ${email} not found`);
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: config.NODE_ENV === 'production',
+                signed: true,
+                sameSite: 'lax',
+                path: "/"
+            });
+
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: config.NODE_ENV === 'production',
+                signed: true,
+                sameSite: 'lax',
+                path: "/"
+            });
+
+            const token = createToken(user._id.toString(), user.email, user.isVerified);
+            const refreshToken = createRefreshToken(user._id.toString(), user.email);
+
+            res.cookie('authToken', token, {
+                httpOnly: true,
+                secure: config.NODE_ENV === 'production',
+                maxAge: 60 * 60 * 1000,
+                signed: true,
+                sameSite: 'lax',
+                path: "/"
+            });
+
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: config.NODE_ENV === 'production',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (match refresh token expiry)
+                signed: true,
+                sameSite: 'lax',
+                path: "/"
+            });
+
+            Logger.info(`User ${email} signed in successfully with WHITELIST OTP`);
+
+            return res.status(200).json({
+                message: "Login successful (whitelist)",
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    isVerified: user.isVerified
+                }
+            });
+        }
+        // --- END WHITELIST ---
 
         const user = await User.findOne({ email });
         if (!user) {
