@@ -130,7 +130,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-          
+
       - name: Pull latest images and restart chatbot services
         run: |
           cd /home/ubuntu/ai-chatbot
@@ -146,7 +146,7 @@ jobs:
           
           # Check if containers are running
           echo "=== Chatbot Container Status ==="
-          cd /home/ubuntu/chatbot
+          cd /home/ubuntu/ai-chatbot
           docker compose ps
           
           # Check container logs
