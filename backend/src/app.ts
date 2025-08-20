@@ -11,8 +11,14 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(cors({
-    origin: appConfig.FRONTEND_URL, // Set your CORS origin here
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    origin: [
+        appConfig.FRONTEND_URL,
+        'http://localhost:3001',
+        'http://localhost:3000',
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 app.use(express.json());
 app.use(cookieParser(appConfig.COOKIE_SECRET)); // Optional secret for signed cookies

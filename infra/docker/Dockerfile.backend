@@ -14,18 +14,10 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Add debugging steps after build
-RUN echo "=== POST BUILD DEBUG ===" && \
-    echo "Source files:" && \
-    find src -name "*logger*" -type f 2>/dev/null || echo "No logger files in src" && \
-    echo "Built files:" && \
-    find dist -name "*logger*" -type f 2>/dev/null || echo "No logger files in dist" && \
-    echo "All files in dist/utils:" && \
-    ls -la dist/utils/ 2>/dev/null || echo "No utils directory in dist" && \
-    echo "Package.json type:" && \
-    grep -A 2 -B 2 '"type"' package.json || echo "No type field in package.json" && \
-    echo "tsconfig.json module:" && \
-    grep -A 2 -B 2 '"module"' tsconfig.json || echo "No module field in tsconfig.json"
+#  Keep minimal verification for preventing future issues
+RUN test -f dist/utils/logger.js && \
+    test -f dist/index.js && \
+    echo "Build verification passed"
 
 # Production stage
 FROM base AS production
@@ -46,17 +38,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
-# Add debugging steps in production stage
-RUN echo "=== PRODUCTION STAGE DEBUG ===" && \
-    echo "Files copied to production:" && \
-    find dist -name "*logger*" -type f 2>/dev/null || echo "No logger files found" && \
-    echo "Utils directory contents:" && \
-    ls -la dist/utils/ 2>/dev/null || echo "Utils directory not found" && \
-    echo "Main index.js first 10 lines:" && \
-    head -10 dist/index.js 2>/dev/null || echo "index.js not found" && \
-    echo "Package.json in production:" && \
-    cat package.json | grep -A 3 -B 3 '"type"\|"main"' || echo "No relevant fields"
-
 # Set ownership for all files
 RUN chown -R expressjs:nodejs /app
 
@@ -68,14 +49,5 @@ EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:8001/health || exit 1
 
-# Add pre-start debugging
-CMD ["sh", "-c", "echo '=== RUNTIME DEBUG ===' && \
-     echo 'Current directory:' && pwd && \
-     echo 'Files in current directory:' && ls -la && \
-     echo 'Files in dist:' && ls -la dist/ && \
-     echo 'Files in dist/utils:' && ls -la dist/utils/ 2>/dev/null || echo 'No utils directory' && \
-     echo 'Logger files search:' && find . -name '*logger*' -type f 2>/dev/null || echo 'No logger files found' && \
-     echo 'Attempting to require logger:' && \
-     node -e \"try { console.log('Logger test:', require('./dist/utils/logger')); } catch(e) { console.log('Logger error:', e.message); console.log('Files in utils:', require('fs').readdirSync('./dist/utils').join(', ')); }\" && \
-     echo 'Starting application...' && \
-     npm start"]
+# Simple, clean startup
+CMD ["npm", "start"]
