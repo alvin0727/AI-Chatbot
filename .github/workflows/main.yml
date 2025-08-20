@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - "apps/backend/**"
-      - "apps/frontend/**"
+      - "backend/**"
+      - "frontend/**"
       - "infra/docker/**"
       - ".github/workflows/**"
 
@@ -28,37 +28,37 @@ jobs:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: |
-            apps/backend/package-lock.json
-            apps/frontend/package-lock.json
+            backend/package-lock.json
+            frontend/package-lock.json
       
       - name: Install Backend Dependencies
         run: |
-          cd apps/backend
+          cd backend
           npm ci
       
       - name: Install Frontend Dependencies
         run: |
-          cd apps/frontend
+          cd frontend
           npm ci
       
       - name: Lint Backend Code
         run: |
-          cd apps/backend
+          cd backend
           npm run lint || echo "Backend linting completed"
       
       - name: Lint Frontend Code
         run: |
-          cd apps/frontend
+          cd frontend
           npm run lint || echo "Frontend linting completed"
       
       - name: Run Backend Tests
         run: |
-          cd apps/backend
+          cd backend
           npm test || echo "Backend tests completed"
       
       - name: Run Frontend Tests
         run: |
-          cd apps/frontend
+          cd frontend
           npm test || echo "Frontend tests completed"
 
   build-and-push-ecr-image:
@@ -97,7 +97,7 @@ jobs:
           echo "Building chatbot backend image..."
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$BACKEND_TAG \
             --target production \
-            -f infra/docker/Dockerfile.backend apps/backend
+            -f infra/docker/Dockerfile.backend backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BACKEND_TAG
           echo "Chatbot backend image pushed successfully"
 
@@ -110,7 +110,7 @@ jobs:
             --build-arg NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN \
             --target production \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$FRONTEND_TAG \
-            -f infra/docker/Dockerfile.frontend apps/frontend
+            -f infra/docker/Dockerfile.frontend frontend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$FRONTEND_TAG
           echo "Chatbot frontend image pushed successfully"
 
@@ -210,7 +210,7 @@ jobs:
           
           # Check if containers are running
           echo "=== Chatbot Container Status ==="
-          cd /home/ubuntu/ai-chatbot
+          cd /home/ubuntu/chatbot
           docker compose ps
           
           # Check container logs
