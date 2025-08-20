@@ -1,6 +1,6 @@
 import winston from 'winston';
 import path from 'path';
-import {config} from "../config/config.js";
+import { config } from "../config/config.js";
 
 // Define log levels
 const levels = {
@@ -50,6 +50,8 @@ const transports = [
   new winston.transports.File({
     filename: path.join('logs', 'error.log'),
     level: 'error',
+    maxsize: 5 * 1024 * 1024, // 5 MB
+    maxFiles: 3,              // Keep 3 backup files
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.uncolorize(),
@@ -59,6 +61,8 @@ const transports = [
   // File transport for all logs (without colors)
   new winston.transports.File({
     filename: path.join('logs', 'combined.log'),
+    maxsize: 10 * 1024 * 1024, // 10 MB
+    maxFiles: 5,               // Keep 5 backup files
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.uncolorize(),
