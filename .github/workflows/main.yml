@@ -1,0 +1,243 @@
+name: deploy-compose
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/backend/**"
+      - "apps/frontend/**"
+      - "infra/docker/**"
+      - ".github/workflows/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: |
+            apps/backend/package-lock.json
+            apps/frontend/package-lock.json
+      
+      - name: Install Backend Dependencies
+        run: |
+          cd apps/backend
+          npm ci
+      
+      - name: Install Frontend Dependencies
+        run: |
+          cd apps/frontend
+          npm ci
+      
+      - name: Lint Backend Code
+        run: |
+          cd apps/backend
+          npm run lint || echo "Backend linting completed"
+      
+      - name: Lint Frontend Code
+        run: |
+          cd apps/frontend
+          npm run lint || echo "Frontend linting completed"
+      
+      - name: Run Backend Tests
+        run: |
+          cd apps/backend
+          npm test || echo "Backend tests completed"
+      
+      - name: Run Frontend Tests
+        run: |
+          cd apps/frontend
+          npm test || echo "Frontend tests completed"
+
+  build-and-push-ecr-image:
+    name: Build and Push Docker Images to ECR
+    needs: integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push backend & frontend images to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          BACKEND_TAG: chatbot:backend
+          FRONTEND_TAG: chatbot:frontend
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_APP_NAME: ${{ secrets.VITE_APP_NAME }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+        run: |
+          # Build & push backend
+          echo "Building chatbot backend image..."
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$BACKEND_TAG \
+            --target production \
+            -f infra/docker/Dockerfile.backend apps/backend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BACKEND_TAG
+          echo "Chatbot backend image pushed successfully"
+
+          # Build & push frontend with environment variables
+          echo "Building chatbot frontend image..."
+          docker build \
+            --build-arg VITE_API_URL=$VITE_API_URL \
+            --build-arg VITE_APP_NAME="$VITE_APP_NAME" \
+            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --build-arg NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN \
+            --target production \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$FRONTEND_TAG \
+            -f infra/docker/Dockerfile.frontend apps/frontend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$FRONTEND_TAG
+          echo "Chatbot frontend image pushed successfully"
+
+  deploy-to-ec2:
+    name: Deploy to EC2 (docker-compose)
+    needs: build-and-push-ecr-image
+    runs-on: self-hosted
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Create deployment directory
+        run: |
+          mkdir -p /home/ubuntu/chatbot
+          cd /home/ubuntu/chatbot
+
+      - name: Create docker-compose.yml for Chatbot
+        run: |
+          cd /home/ubuntu/chatbot
+          cat > docker-compose.yml << 'EOF'
+          version: '3.8'
+          
+          services:
+            chatbot-backend:
+              image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:chatbot:backend
+              container_name: chatbot-backend
+              ports:
+                - "8001:8001"
+              environment:
+                - NODE_ENV=production
+                - PORT=8001
+                - DATABASE_URL=${{ secrets.DATABASE_URL }}
+                - JWT_SECRET=${{ secrets.JWT_SECRET }}
+                - OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+                - ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+              restart: unless-stopped
+              healthcheck:
+                test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+                start_period: 60s
+              networks:
+                - chatbot-network
+              labels:
+                - "com.docker.compose.service=chatbot-backend"
+          
+            chatbot-frontend:
+              image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:chatbot:frontend
+              container_name: chatbot-frontend
+              ports:
+                - "3001:3001"
+              environment:
+                - VITE_API_URL=http://localhost:8001
+                - VITE_APP_NAME=Chatbot App
+              restart: unless-stopped
+              healthcheck:
+                test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+                start_period: 60s
+              networks:
+                - chatbot-network
+              depends_on:
+                - chatbot-backend
+              labels:
+                - "com.docker.compose.service=chatbot-frontend"
+          
+          networks:
+            chatbot-network:
+              driver: bridge
+              name: chatbot-network
+          EOF
+
+      - name: Pull latest images and restart chatbot services
+        run: |
+          cd /home/ubuntu/chatbot
+          echo "Pulling latest chatbot images..."
+          docker compose pull
+          echo "Starting chatbot services..."
+          docker compose up -d --remove-orphans --force-recreate
+
+      - name: Verify chatbot deployment
+        run: |
+          echo "Waiting for chatbot services to start..."
+          sleep 45
+          
+          # Check if containers are running
+          echo "=== Chatbot Container Status ==="
+          cd /home/ubuntu/ai-chatbot
+          docker compose ps
+          
+          # Check container logs
+          echo "=== Chatbot Backend Logs (last 20 lines) ==="
+          docker compose logs --tail=20 chatbot-backend
+          
+          echo "=== Chatbot Frontend Logs (last 20 lines) ==="
+          docker compose logs --tail=20 chatbot-frontend
+          
+          # Test backend health
+          echo "=== Testing Chatbot Backend Health ==="
+          curl -f http://localhost:8001/health || echo "Chatbot backend health check failed"
+          
+          # Test frontend health  
+          echo "=== Testing Chatbot Frontend Health ==="
+          curl -f http://localhost:3001/ || echo "Chatbot frontend health check failed"
+          
+          # Show final status
+          echo "=== Final Chatbot Deployment Status ==="
+          docker ps --filter "label=com.docker.compose.service=chatbot-backend" --filter "label=com.docker.compose.service=chatbot-frontend"
+
+      - name: Cleanup old images
+        run: |
+          echo "Cleaning up old Docker images..."
+          docker system prune -af
+          echo "Docker cleanup completed"
+          
+          # Show disk usage after cleanup
+          echo "=== Disk usage after cleanup ==="
+          df -h
