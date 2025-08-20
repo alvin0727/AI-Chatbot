@@ -86,8 +86,8 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-          BACKEND_TAG: chatbot:backend
-          FRONTEND_TAG: chatbot:frontend
+          BACKEND_TAG: chatbot-backend
+          FRONTEND_TAG: chatbot-frontend
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_APP_NAME: ${{ secrets.VITE_APP_NAME }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
@@ -144,7 +144,7 @@ jobs:
           
           services:
             chatbot-backend:
-              image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:chatbot:backend
+              image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:chatbot-backend
               container_name: chatbot-backend
               ports:
                 - "8001:8001"
@@ -168,7 +168,7 @@ jobs:
                 - "com.docker.compose.service=chatbot-backend"
           
             chatbot-frontend:
-              image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:chatbot:frontend
+              image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:chatbot-frontend
               container_name: chatbot-frontend
               ports:
                 - "3001:3001"
