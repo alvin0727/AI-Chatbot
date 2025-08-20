@@ -6,6 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { Toaster } from 'react-hot-toast'
+import Footer from './pages/Footer.tsx'
 
 const theme = createTheme({
   typography: {
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
         <ThemeProvider theme={theme}>
           <Toaster position="top-right" />
           <App />
+          <Footer />
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
