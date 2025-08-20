@@ -130,12 +130,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-
-      - name: Create deployment directory
-        run: |
-          mkdir -p /home/ubuntu/chatbot
-          cd /home/ubuntu/chatbot
-
+          
       - name: Pull latest images and restart chatbot services
         run: |
           cd /home/ubuntu/ai-chatbot
