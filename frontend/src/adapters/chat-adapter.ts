@@ -12,8 +12,13 @@ const deleteAllChatsAdapter = () => {
     return api.delete("/chat/delete-all-chats");
 };
 
+const getChatLimitInfoAdapter = () => {
+    return api.get("/chat/chat-limit-info");
+};
+
 export default {
     sendMessageAdapter,
     getAllChatsAdapter,
-    deleteAllChatsAdapter
+    deleteAllChatsAdapter,
+    getChatLimitInfoAdapter
 };

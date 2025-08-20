@@ -27,8 +27,18 @@ const deleteAllChats = async () => {
     }
 }
 
+const getChatLimitInfo = async () => {
+    try {
+        const response = await ChatAdapter.getChatLimitInfoAdapter();
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export default {
     sendMessage,
     getAllChats,
-    deleteAllChats
+    deleteAllChats,
+    getChatLimitInfo
 };
