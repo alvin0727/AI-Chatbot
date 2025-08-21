@@ -46,16 +46,17 @@ const Login = () => {
         <Box
             width="100%"
             height="100%"
+            minHeight="100vh"
             display="flex"
             flex={1}
             flexDirection={{ xs: "column", md: "row" }}
             alignItems="center"
             justifyContent="center"
             gap={{ xs: 2, md: 4 }}
+            mb={{ xs: 8, md: 4 }}
         >
             <Box
                 padding={{ xs: 2, md: 3 }}
-                mt={{ md: 8, xs: 2 }}
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -75,7 +76,6 @@ const Login = () => {
                 alignItems="center"
                 padding={{ xs: 2, md: 4 }}
                 ml={{ md: "auto", xs: 0 }}
-                mt={{ md: 16, xs: 2 }}
                 width="100%"
             >
                 <form
