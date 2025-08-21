@@ -212,6 +212,7 @@ const Chat = () => {
                 height: '100%',
                 mt: isXs ? 1 : 3,
                 gap: isXs ? 1 : 3,
+                mb: 6,
                 flexDirection: { xs: "column", md: "row" },
             }}
         >
